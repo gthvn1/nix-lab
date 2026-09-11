@@ -8,5 +8,11 @@
       pkgs = nixpkgs.legacyPackages.${system};
       in {
         packages.${system}.default = pkgs.hello;
+        devShells.${system}.default = pkgs.mkShell {
+          packages = [
+            pkgs.cowsay
+            pkgs.hello
+          ];
+        };
       };
 }

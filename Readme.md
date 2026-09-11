@@ -27,4 +27,8 @@ outputs.packages.x86_64-linux.default
 
 ## A dev shell
 
-*in progress...*
+- To use a shell we do: `nix develop`.
+- Without arguments `nix develop` looks up `devShells.${system}.default`.
+- Like `nix build/nix run` default to `packages.${system}.default`.
+- So in the `flake.init` we set `mkShell {...}` that is a derivation.
+- The output of the derivation `mkShell {...}` allows to reconstruct a build-time environment and drops us into it.
