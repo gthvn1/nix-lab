@@ -32,3 +32,7 @@ outputs.packages.x86_64-linux.default
 - Like `nix build/nix run` default to `packages.${system}.default`.
 - So in the `flake.init` we set `mkShell {...}` that is a derivation.
 - The output of the derivation `mkShell {...}` allows to reconstruct a build-time environment and drops us into it.
+- An interesting point:
+  - `result/` created when running `nix build` is a link to `/nix/store/...`.
+  - External links are tracked by nix in `/nix/var/nix/gcroots/auto/`.
+  - It means that a nix GC will not cleanup things we are using
