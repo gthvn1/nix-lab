@@ -36,6 +36,10 @@ outputs.packages.x86_64-linux.default
   - External links are tracked by nix in `/nix/var/nix/gcroots/auto/`.
   - It means that a nix GC will not cleanup things we are using
 
+## Overlay
+
+**_TODO_**
+
 ## Hints
 
 ### Nil: the lsp
@@ -52,3 +56,42 @@ ls -l ~/.nix-profile/bin/
   - you will have to enable direnv the first time you enter the directory: `direnv allow`
   - Exit dir unload things
   - Status: `direnv status`
+
+### Crane (Rust)
+
+- There is a nice tool that reads your Cargo.lock when building your flake
+- It gets the packages into your env
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    crane.url = "github:ipetkov/crane";
+  };
+
+  outputs = { self, nixpkgs, crane }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+      craneLib = crane.mkLib pkgs;
+    in {
+      packages.${system}.default = craneLib.buildPackage {
+        src = craneLib.cleanCargoSource ./.;
+      };
+
+      devShells.${system}.default = craneLib.devShell {
+        packages = [ pkgs.rust-analyzer ];
+      };
+    };
+}
+```
+- `nix flake lock` resolves crane, write it into flake.lock
+- With cargo you can generate a *Cargo.lock* without building the project: `cargo generate-lockfile`
+```
+cargo add serde              # edits Cargo.toml only
+cargo generate-lockfile      # resolves versions → writes Cargo.lock
+```
+
+### zon2zig
+
+- It is like crane but for Zig.
+- It reads `build.zig.zon`
