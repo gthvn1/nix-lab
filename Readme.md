@@ -65,7 +65,6 @@ ls -l ~/.nix-profile/bin/
     - If later you run `nix flake update` it will be revaluated.
 
 ### Crane (Rust)
-
 - There is a nice tool that reads your Cargo.lock when building your flake
 - It gets the packages into your env
 ```nix
@@ -99,6 +98,23 @@ cargo generate-lockfile      # resolves versions → writes Cargo.lock
 ```
 
 ### zon2zig
-
 - It is like crane but for Zig.
 - It reads `build.zig.zon`
+
+### OCaml
+- For OCaml, instead of installing stuff using `opam`, you can install libraries using `ocamlPackages`.
+- If you are using a custom opam repo it is probably better to not use nix.
+- My understanding is that `ocamlPackages` are from default.
+- For a custom repo you will probably need to provide Nix packages yourself...
+- Example of dev shells:
+```
+devShells.${system}.default = pkgs.mkShell {
+  packages = [
+    pkgs.dune_3
+    pkgs.ocaml
+    pkgs.ocamlPackages.ocamlformat
+    pkgs.ocamlPackages.ocaml-lsp
+    pkgs.ocamlPackages.utop
+  ];
+};
+```
