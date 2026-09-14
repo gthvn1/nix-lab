@@ -56,6 +56,13 @@ ls -l ~/.nix-profile/bin/
   - you will have to enable direnv the first time you enter the directory: `direnv allow`
   - Exit dir unload things
   - Status: `direnv status`
+  - You can use a cache:
+    - install nix-direnv: `nix profile install nixpkgs#nix-direnv`
+    - load it in direnv:
+      - `mkdir ~/.conf/direnv`
+      - and add `source $HOME/.nix-profile/share/nix-direnv/direnvrc` into `~/.config/direnv/direnvrc`
+    - That's it.
+    - If later you run `nix flake update` it will be revaluated.
 
 ### Crane (Rust)
 
