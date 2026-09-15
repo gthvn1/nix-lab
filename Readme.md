@@ -36,6 +36,72 @@ outputs.packages.x86_64-linux.default
   - External links are tracked by nix in `/nix/var/nix/gcroots/auto/`.
   - It means that a nix GC will not cleanup things we are using
 
+## Home manager
+
+- You can also manage your dots file using home manager.
+- There are different "flavors", we will use the flake one.
+- just create a directory and git init:
+
+```sh
+mkdir -p ~/.config/home-manager
+cd ~/.config/home-manager
+git init
+```
+
+- You need two files:
+  - `flake.nix`, the boilerplate, you write it once basically.
+  - `home.nix`; the real configuration where you declare packages and programs setting.
+  
+- Example of a `flake.nix`:
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = { nixpkgs, home-manager, ... }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      homeConfigurations.gthvn1 = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [ ./home.nix ];
+      };
+    };
+}
+```
+- And the `home.nix`:
+```nix
+{ pkgs, ... }:
+{
+  home.username = "gthvn1";
+  home.homeDirectory = "/home/gthvn1";
+  home.stateVersion = "24.11"; # Pins config-format compatibility; set once.
+                               # It is used for backward compat.
+
+  # what you actually want:
+  # Note: nil is not available as programs
+  home.packages = [ pkgs.nil ];
+
+  programs.home-manager.enable = true;
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+}
+```
+- Don't forget to add files: `git add .`
+- The first time you run it: `nix run github:nix-community/home-manager -- switch --flake .#gthvn1`
+- After that, `home-manager` is installed and you can apply new config by running:
+  - `home-manager switch --flake .#gthvn1`
+- To see generations: `home-manager generations`
+- Profiles are under `~/.local/state/nix/profiles`
+
 ## Overlay
 
 **_TODO_**
